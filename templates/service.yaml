@@ -1,0 +1,22 @@
+{{ include "check.required.values.all" (dict "Values" .Values) }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.applicationName }}-{{ .Values.applicationEnv }}
+  labels:
+    app: {{ tpl .Values.applicationLabel . }}
+    template: build-deploy
+  annotations:
+    description: The applications http port.
+spec:
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: 8778-tcp
+      protocol: TCP
+      port: 8778
+      targetPort: 8778
+  selector:
+    deployment: {{ .Values.applicationName }}-{{ .Values.applicationEnv }}

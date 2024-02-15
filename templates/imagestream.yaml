@@ -1,0 +1,9 @@
+{{- if .Values.build.enabled }}
+{{ include "check.required.values.all" (dict "Values" .Values) }}
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: {{ .Values.applicationName }}
+  labels:
+    app: {{ tpl .Values.applicationLabel . }}
+{{- end }}
