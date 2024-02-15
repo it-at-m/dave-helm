@@ -1,0 +1,38 @@
+#############################################
+# Allgemeine Parameter - !! Pflichtfelder!! #
+#############################################
+
+## Alle Namen der Openshift Objekte werden aus dem Namen der Anwendung und der Umgebung zusammengesetzt:  applicationName-applicationEnv
+## Name der Anwendung.
+## Beispiel - applicationName: "mypp"
+applicationName: "dave-external"
+
+## Name der Umgebung.
+## Beispiel - applicationEnv: "dev"
+applicationEnv: "dev"
+
+## Setzt die aktiven Spring Profiles.
+## Wird für die Umgebungsvariable SPRING_PROFILES_ACTIVE der Anwendung verwendet,
+## siehe hier: https://git.muenchen.de/ccse/cicd/helm-template/-/blob/main/values.yaml#L61
+## Beispiel - springProfilesActive: "openshift,dev,no-security"
+springProfilesActive: "{{ .Values.applicationEnv }}"
+
+## Wert für das label 'app'. Die Openshift Objekte können darüber gesucht werden (z.B. app=application-label)
+## Beispiel - applicationLoabe: "myApp-dev"
+applicationLabel: "{{ .Values.applicationName }}-{{ .Values.applicationEnv }}"
+
+#############################################
+# Deployment Parameter                      #
+#############################################
+deploy:
+  ## Anzahl der zu startenden replicas (pods).
+  ## Weitere Informationen: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#replicas
+  ## Im Template: https://git.muenchen.de/ccse/cicd/helm/helm-template/-/blob/main/templates/deployment.yaml#L8
+  replicas: 1
+
+  annotations:
+    ## Opensource-Projekte zum automatischen Rollout von Images.
+    ## Weitere Informationen: https://docs.openshift.com/container-platform/4.14/openshift_images/triggering-updates-on-imagestream-changes.html
+    # image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"{{tpl .Values.deploy.image .}}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"{{ .Values.applicationName }}-{{ .Values.applicationEnv }}\")].image"}]'
+  ## Angabe des Images. Bei Opensource Projekten bitte ändern.
+  image: "itatm/dave-backend:latest"
