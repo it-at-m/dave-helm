@@ -5,7 +5,7 @@
 ## Alle Namen der Openshift Objekte werden aus dem Namen der Anwendung und der Umgebung zusammengesetzt:  applicationName-applicationEnv
 ## Name der Anwendung.
 ## Beispiel - applicationName: "mypp"
-applicationName: "dave-external"
+applicationName: "dave-backend"
 
 ## Name der Umgebung.
 ## Beispiel - applicationEnv: "dev"
