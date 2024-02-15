@@ -2,10 +2,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ .Values.applicationName }}-{{ .Values.applicationEnv }}
+  name: {{ .Values.daveBackend.applicationName }}-{{ .Values.daveBackend.applicationEnv }}
   labels:
-    app: {{ tpl .Values.applicationLabel . }}
-    template: build-deploy
+    app: {{ tpl .Values.daveBackend.applicationLabel . }}
+    template: dave
   annotations:
     description: The applications http port.
 spec:
@@ -19,4 +19,4 @@ spec:
       port: 8778
       targetPort: 8778
   selector:
-    deployment: {{ .Values.applicationName }}-{{ .Values.applicationEnv }}
+    deployment: {{ .Values.daveBackend.applicationName }}-{{ .Values.daveBackend.applicationEnv }}
