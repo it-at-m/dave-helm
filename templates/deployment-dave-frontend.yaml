@@ -1,0 +1,125 @@
+{{ include "check.required.values.all" (dict "Values" .Values) }}
+{{ include "check.required.values.deployment" (dict "Values" .Values) }}
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  {{ with .Values.daveFrontend.deploy.annotations }}
+  annotations:
+    {{ tpl (toYaml .) $ | nindent 4 }}
+  {{ end }}
+  name: {{ .Values.daveFrontend.applicationName }}-{{ .Values.daveFrontend.applicationEnv }}
+  labels:
+    app: {{ tpl .Values.daveFrontend.applicationLabel . }}
+spec:
+  replicas: {{ .Values.daveFrontend.deploy.replicas }}
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      deployment: {{ .Values.daveFrontend.applicationName }}-{{ .Values.daveFrontend.applicationEnv }}
+  template:
+    metadata:
+      name: {{ .Values.daveFrontend.applicationName }}-{{ .Values.daveFrontend.applicationEnv }}
+      labels:
+        app: {{ tpl .Values.daveFrontend.applicationLabel . }}
+        deployment: {{ .Values.daveFrontend.applicationName }}-{{ .Values.daveFrontend.applicationEnv }} 
+    spec:
+      volumes:
+        - name: cacerts-lhm
+          secret:
+            defaultMode: 420
+            secretName: cacerts-lhm
+            items:
+              - key: cacerts-lhm
+                path: cacerts
+{{- if .Values.daveFrontend.deploy.volumes }}
+        {{- tpl (toYaml .Values.daveFrontend.deploy.volumes) . | nindent 8 }}
+{{- end }}
+      containers:
+        - resources:
+            limits:
+              cpu: {{ .Values.daveFrontend.deploy.resources.limits.cpu }}
+              memory: {{ .Values.daveFrontend.deploy.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.daveFrontend.deploy.resources.requests.cpu }}
+              memory: {{ .Values.daveFrontend.deploy.resources.requests.memory }}
+          readinessProbe:
+            failureThreshold: {{ .Values.daveFrontend.deploy.readinessProbe.failureThreshold }}
+            httpGet:
+              path: {{ .Values.daveFrontend.deploy.readinessProbe.httpGet.path }}
+              port: {{ .Values.daveFrontend.deploy.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.daveFrontend.deploy.readinessProbe.httpGet.scheme }}
+            initialDelaySeconds: {{ .Values.daveFrontend.deploy.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.daveFrontend.deploy.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.daveFrontend.deploy.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.daveFrontend.deploy.readinessProbe.timeoutSeconds }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - sh
+                  - -c
+                  - sleep {{ .Values.daveFrontend.deploy.lifecycle.preStop.sleep }}
+          name: {{ .Values.daveFrontend.applicationName }}-{{ .Values.daveFrontend.applicationEnv }}
+          livenessProbe:
+            failureThreshold: {{ .Values.daveFrontend.deploy.livenessProbe.failureThreshold }}
+            httpGet:
+              path: {{ .Values.daveFrontend.deploy.livenessProbe.httpGet.path }}
+              port: {{ .Values.daveFrontend.deploy.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.daveFrontend.deploy.livenessProbe.httpGet.scheme }}
+            initialDelaySeconds: {{ .Values.daveFrontend.deploy.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.daveFrontend.deploy.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.daveFrontend.deploy.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.daveFrontend.deploy.livenessProbe.timeoutSeconds }}
+          startupProbe:
+            httpGet:
+             path: {{ .Values.daveFrontend.deploy.startupProbe.httpGet.path }}
+             port:  {{ .Values.daveFrontend.deploy.startupProbe.httpGet.port }}
+             scheme: {{ .Values.daveFrontend.deploy.startupProbe.httpGet.scheme }}
+            failureThreshold: {{ .Values.daveFrontend.deploy.startupProbe.failureThreshold }}
+            periodSeconds: {{ .Values.daveFrontend.deploy.startupProbe.periodSeconds }}
+          env:
+{{- range $key, $value := ( required "Fehler" .Values.daveFrontend.deploy.env ) }}
+            - name: {{ $key }}
+              value: {{ tpl ($value | quote) $ }}
+{{- end }}
+{{- if .Values.daveFrontend.deploy.envWithSecrets }}
+        {{- tpl (toYaml .Values.daveFrontend.deploy.envWithSecrets) . | nindent 12 }}
+{{- end }}
+{{- if .Values.daveFrontend.deploy.envWithConfigMap }}
+        {{- tpl (toYaml .Values.daveFrontend.deploy.envWithConfigMap) . | nindent 12 }}
+{{- end }}
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+          ports:
+            - containerPort: 8778
+              name: jolokia
+              protocol: TCP
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /etc/pki/ca-trust/extracted/java
+              name: cacerts-lhm
+              readOnly: true
+{{- if .Values.daveFrontend.deploy.volumeMounts }}
+            {{- tpl (toYaml .Values.daveFrontend.deploy.volumeMounts) . | nindent 12 }}
+{{- end }}
+          envFrom:
+{{- if .Values.daveFrontend.deploy.envFrom }}
+        {{- tpl (toYaml .Values.daveFrontend.deploy.envFrom) . | nindent 12 }}
+{{- end }}
+          image: {{ tpl .Values.daveFrontend.deploy.image . }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 75
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate

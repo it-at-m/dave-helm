@@ -5,3 +5,7 @@ description:
 name: dave
 tags: java
 version: v0.0.1
+dependencies:
+  - name: elasticsearch
+    repository: https://charts.bitnami.com/bitnami
+    version: 19.17.0

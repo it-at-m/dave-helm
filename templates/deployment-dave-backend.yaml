@@ -42,41 +42,41 @@ spec:
             requests:
               cpu: {{ .Values.daveBackend.deploy.resources.requests.cpu }}
               memory: {{ .Values.daveBackend.deploy.resources.requests.memory }}
-          readinessProbe:
-            failureThreshold: {{ .Values.daveBackend.deploy.readinessProbe.failureThreshold }}
-            httpGet:
-              path: {{ .Values.daveBackend.deploy.readinessProbe.httpGet.path }}
-              port: {{ .Values.daveBackend.deploy.readinessProbe.httpGet.port }}
-              scheme: {{ .Values.daveBackend.deploy.readinessProbe.httpGet.scheme }}
-            initialDelaySeconds: {{ .Values.daveBackend.deploy.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.daveBackend.deploy.readinessProbe.periodSeconds }}
-            successThreshold: {{ .Values.daveBackend.deploy.readinessProbe.successThreshold }}
-            timeoutSeconds: {{ .Values.daveBackend.deploy.readinessProbe.timeoutSeconds }}
-          lifecycle:
-            preStop:
-              exec:
-                command:
-                  - sh
-                  - -c
-                  - sleep {{ .Values.daveBackend.deploy.lifecycle.preStop.sleep }}
+#          readinessProbe:
+#            failureThreshold: {{ .Values.daveBackend.deploy.readinessProbe.failureThreshold }}
+#            httpGet:
+#              path: {{ .Values.daveBackend.deploy.readinessProbe.httpGet.path }}
+#              port: {{ .Values.daveBackend.deploy.readinessProbe.httpGet.port }}
+#              scheme: {{ .Values.daveBackend.deploy.readinessProbe.httpGet.scheme }}
+#            initialDelaySeconds: {{ .Values.daveBackend.deploy.readinessProbe.initialDelaySeconds }}
+#            periodSeconds: {{ .Values.daveBackend.deploy.readinessProbe.periodSeconds }}
+#            successThreshold: {{ .Values.daveBackend.deploy.readinessProbe.successThreshold }}
+#            timeoutSeconds: {{ .Values.daveBackend.deploy.readinessProbe.timeoutSeconds }}
+#          lifecycle:
+#            preStop:
+#              exec:
+#                command:
+#                  - sh
+#                  - -c
+#                  - sleep {{ .Values.daveBackend.deploy.lifecycle.preStop.sleep }}
           name: {{ .Values.daveBackend.applicationName }}-{{ .Values.daveBackend.applicationEnv }}
-          livenessProbe:
-            failureThreshold: {{ .Values.daveBackend.deploy.livenessProbe.failureThreshold }}
-            httpGet:
-              path: {{ .Values.daveBackend.deploy.livenessProbe.httpGet.path }}
-              port: {{ .Values.daveBackend.deploy.livenessProbe.httpGet.port }}
-              scheme: {{ .Values.daveBackend.deploy.livenessProbe.httpGet.scheme }}
-            initialDelaySeconds: {{ .Values.daveBackend.deploy.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.daveBackend.deploy.livenessProbe.periodSeconds }}
-            successThreshold: {{ .Values.daveBackend.deploy.livenessProbe.successThreshold }}
-            timeoutSeconds: {{ .Values.daveBackend.deploy.livenessProbe.timeoutSeconds }}
-          startupProbe:
-            httpGet:
-             path: {{ .Values.daveBackend.deploy.startupProbe.httpGet.path }}
-             port:  {{ .Values.daveBackend.deploy.startupProbe.httpGet.port }}
-             scheme: {{ .Values.daveBackend.deploy.startupProbe.httpGet.scheme }}
-            failureThreshold: {{ .Values.daveBackend.deploy.startupProbe.failureThreshold }}
-            periodSeconds: {{ .Values.daveBackend.deploy.startupProbe.periodSeconds }}
+#          livenessProbe:
+#            failureThreshold: {{ .Values.daveBackend.deploy.livenessProbe.failureThreshold }}
+#            httpGet:
+#              path: {{ .Values.daveBackend.deploy.livenessProbe.httpGet.path }}
+#              port: {{ .Values.daveBackend.deploy.livenessProbe.httpGet.port }}
+#              scheme: {{ .Values.daveBackend.deploy.livenessProbe.httpGet.scheme }}
+#            initialDelaySeconds: {{ .Values.daveBackend.deploy.livenessProbe.initialDelaySeconds }}
+#            periodSeconds: {{ .Values.daveBackend.deploy.livenessProbe.periodSeconds }}
+#            successThreshold: {{ .Values.daveBackend.deploy.livenessProbe.successThreshold }}
+#            timeoutSeconds: {{ .Values.daveBackend.deploy.livenessProbe.timeoutSeconds }}
+#          startupProbe:
+#            httpGet:
+#             path: {{ .Values.daveBackend.deploy.startupProbe.httpGet.path }}
+#             port:  {{ .Values.daveBackend.deploy.startupProbe.httpGet.port }}
+#             scheme: {{ .Values.daveBackend.deploy.startupProbe.httpGet.scheme }}
+#            failureThreshold: {{ .Values.daveBackend.deploy.startupProbe.failureThreshold }}
+#            periodSeconds: {{ .Values.daveBackend.deploy.startupProbe.periodSeconds }}
           env:
 {{- range $key, $value := ( required "Fehler" .Values.daveBackend.deploy.env ) }}
             - name: {{ $key }}
